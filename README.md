@@ -1,7 +1,6 @@
-# Music bot with lavalink
+# Levellable
 
 A easy/configurable/lots of features for your need!  
-This bot is designed to be stateless music bot (no database, no cache, no persistent data) so no needs for a database!
 
 ## How to host this???
 
@@ -9,22 +8,23 @@ This bot is designed to be stateless music bot (no database, no cache, no persis
 
 - Python 3.8 or higher
 - poetry (`pip install poetry`)
+- postgresql database
 
 ### Procedure
 
-1. Find your lavalink server [here](https://lavalink.darrennathanael.com/).
+1. Setup your postgresql database
 
 2. You can either make your own .env file and fill out these
 
 ```env
-MUSIC_TOKEN=bot token
-MUSIC_SPOTIFY_CLIENT_ID=spotify client id
-MUSIC_SPOTIFY_CLIENT_SECRET=spotify client secret
-MUSIC_LAVALINK_HOST=lavalink host (ip or domain)
-MUSIC_LAVALINK_PORT=lavalink port
-MUSIC_LAVALINK_PASSWORD=lavalink password
-MUSIC_LAVALINK_HTTPS=lavalink https (true or false)
-MUSIC_PREFIX=prefix
+LEVEL_TOKEN=bot token
+LEVEL_PREFIX=prefix 
+LEVEL_DATABASE_HOST=database's ip or domain
+LEVEL_DATABASE_PORT=database's port
+LEVEL_DATABASE_USER=database's user
+LEVEL_DATABASE_PASSWORD=database's password
+LEVEL_DATABASE_NAME=database's name
+
 ```
 
 2.1 You can edit `config/config.py` to your own choice too
@@ -35,14 +35,20 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 
-token = "Bot token"
-prefix = "bot prefix"
-spotify_client_id = "spotify client id"  
-spotify_client_secret = "spotify client secret"
-lavalink_host = "lavalink host (ip or domain)"
-lavalink_port = "lavalink port integer only"
-lavalink_password = "lavalink password"
-lavalink_is_https = True or False based on if you use https or not
+from dotenv import load_dotenv
+
+load_dotenv()
+import os
+
+token = "bot token"
+prefix = "prefix"
+database_host = "database's ip or domain"
+database_port = "database's port"
+database_name = "database's name"
+database_user = "database's user"
+database_password = "database's password"
+database_url = "paste your entire postgresql connection string here if you don't want to fill each items above"
+
 ```
 
 3. Do `poetry install`
@@ -55,16 +61,8 @@ lavalink_is_https = True or False based on if you use https or not
 
 ## Features
 
-[x] Using lavalink
-[x] Spotify supports
-[x] Youtube supports
-[x] Soundcloud supports
-[x] Music queue
-[x] Music loop
-[x] Skipping
-[x] Volume control
-[x] Music search
-[x] Live time update (Every Seconds)
-[ ] Filters
-[ ] Loop queues
-[ ] Skip votes
+- [x] Level system
+- [x] Be able to track user's message or voice chat activity
+- [x] Boost up your level by doing activities
+- [x] Star board for mark your message by using your experience
+- [x] Be able to set your own level requirement for something important like limiting new members to posting files or joining voice chat

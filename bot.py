@@ -13,6 +13,7 @@ import subprocess
 import traceback
 
 from config import config
+from sql.sql import EasySQL
 
 formatting = logging.Formatter("[%(asctime)s] - [%(levelname)s] [%(name)s] %(message)s")
 
@@ -34,6 +35,8 @@ with open("logs/bot.log", "w") as f_:
 f = logging.FileHandler("logs/bot.log", "a")
 f.setFormatter(formatting)
 log.addHandler(f)
+
+args = {"dsn": config.database_url, "ssl": config.database_ssl}
 
 logging.getLogger("discord").setLevel(logging.WARNING)  # mute
 # logging.getLogger("wavelink").setLevel(logging.WARNING)
@@ -106,6 +109,18 @@ async def main():
         started = False
         while not started:
             async with bot:
+                try:
+                    bot.db = await EasySQL().connect(**args)
+                except ConnectionError:
+                    log.fatal("Failed to connect to database")
+                    log.info("Trying to remove SSL context")
+                    args["ssl"] = None
+                    try:
+                        bot.db = await EasySQL().connect(**args)
+                    except ConnectionError:
+                        log.exception("Failed to connect to database")
+                        log.fatal("Exiting...")
+                        return
                 for extension in os.listdir("src"):
                     if extension.endswith(".py") and not extension.startswith("_"):
                         await bot.load_extension(f"src.{extension[:-3]}")
@@ -120,9 +135,6 @@ async def main():
                 log.info(
                     f"Started with version {bot.version_} and started at {bot.start_time}"
                 )
-                if os.environ.get("IS_REPLIT"):
-                    start()
-                    log.info("REPLIT detected opening webserver for recieve pinging")
                 try:
                     await bot.start(config.token)
                 except discord.errors.HTTPException:

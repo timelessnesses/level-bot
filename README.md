@@ -24,7 +24,7 @@ LEVEL_DATABASE_PORT=database's port
 LEVEL_DATABASE_USER=database's user
 LEVEL_DATABASE_PASSWORD=database's password
 LEVEL_DATABASE_NAME=database's name
-
+LEVEL_DATABASE_SSL=connect database with ssl or not (0 or 1)
 ```
 
 2.1 You can edit `config/config.py` to your own choice too
@@ -47,6 +47,7 @@ database_port = "database's port"
 database_name = "database's name"
 database_user = "database's user"
 database_password = "database's password"
+database_ssl = True or False based on your need
 database_url = "paste your entire postgresql connection string here if you don't want to fill each items above"
 
 ```

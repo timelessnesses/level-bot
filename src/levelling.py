@@ -5,6 +5,7 @@ import asyncpg
 from .utils import pre_made_sqls as sqls
 from .utils import imagegen
 import bot as bot_
+import random
 
 
 class Levelling(commands.Cog):
@@ -15,6 +16,9 @@ class Levelling(commands.Cog):
 
     @commands.hybrid_group()
     async def level(self, ctx: commands.Context, member: discord.Member = None):
+        """
+        Level group command
+        """
         if member is None:
             member = ctx.author
         if ctx.invoked_subcommand is None:
@@ -22,6 +26,7 @@ class Levelling(commands.Cog):
 
     @level.command(name="info", aliases=["lvl"])
     async def info(self, ctx: commands.Context, member: discord.Member = None):
+        # TODO: sort members in guild :pog:
         if member is None:
             member = ctx.author
         if member.bot:
@@ -32,48 +37,48 @@ class Levelling(commands.Cog):
                     color=discord.Color.red(),
                 )
             )
-        level = await self.db.execute(
-            "SELECT experience, max_experience FROM user_ WHERE user_id = $1", member.id
+        level = (
+            await sqls.execute("SELECT * FROM user_ WHERE user_id = $1", member.id)
+        )[0]
+        try:
+            bg_path = (
+                await sqls.execute(
+                    "SELECT background FROM levels_background WHERE guild_id",
+                    ctx.guild.id,
+                )
+            )[0]["background"]
+        except IndexError:
+            bg_path = None
+        users = await sqls.execute("SELECT * FROM user_")
+        users = sorted(users, key=lambda x: x["experience"], reverse=True)
+        position = users.index(level) + 1
+        xp = level["experience"]
+        max_xp = level["max_experience"]
+        return await ctx.send(
+            file=await imagegen.generate_profile(
+                bg_path,
+                member.avatar_url,
+                level["current_level"],
+                xp,
+                max_xp,
+                position,
+                str(member),
+                str(member.status),
+                tuple(
+                    (
+                        await sqls.execute(
+                            "SELECT color FROM font_colors WHERE guild_id = $1",
+                            ctx.guild.id,
+                        )
+                    )[0]["color"].split(",")
+                ),
+            )
         )
-        if not level:
-            await self.db.execute(
-                "INSERT INTO user_ (user_id, experience, max_experience) VALUES ($1, $2, $3)",
-                member.id,
-                0,
-                100,
-            )
-            bg_path = await self.db.execute(
-                "SELECT background FROM levels_background WHERE guild_id = $1",
-                ctx.guild.id,
-            )
-            print(
-                await imagegen.Generator().generate_profile(
-                    bg_path[0]["background"],
-                    member.avatar_url,
-                    1,
-                    0,
-                    0,
-                    100,
-                    "?",
-                    "?",
-                    str(member),
-                    str(member.status),
-                ),
-            )
-            return await ctx.send(
-                file=await imagegen.Generator().generate_profile(
-                    bg_path[0]["background"],
-                    member.avatar_url,
-                    1,
-                    0,
-                    0,
-                    100,
-                    "?",
-                    "?",
-                    str(member),
-                    str(member.status),
-                ),
-            )
+
+    # TODO: make a on_message event that listen and keep track of the member's message then increase the exp
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        await sqls.execute("UPDATE user_")
 
 
 async def setup(bot: commands.Bot):

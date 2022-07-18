@@ -1,15 +1,17 @@
-from PIL import Image, ImageDraw
-import io
+from src.utils.imagegen import Generator
+import asyncio
 
-
-def box(rgb: tuple) -> io.BytesIO:
-    image = Image.new("RGBA", (100, 100))
-    draw = ImageDraw.Draw(image)
-    draw.rectangle((0, 0, 100, 100), fill=(rgb))
-    file = io.BytesIO()
-    image.save(file, "png")
-    file.seek(0)
-    return file
-
-
-open("g.png", "wb").write(box((0, 255, 1)).read())
+open("g.png", "wb").write(
+    asyncio.run(
+        Generator().generate_profile(
+            None,
+            "http://localhost/61a06af00bf7c9b332b5c134.jpg",
+            69,
+            420,
+            1000,
+            1,
+            "deez nut#0000",
+            "online",
+        )
+    ).fp.read()
+)

@@ -1,28 +1,30 @@
-CREATE TABLE IF NOT EXISTS user_(
+CREATE TABLE
+  IF NOT EXISTS user_(
     user_id BIGSERIAL PRIMARY KEY,
     experience INTEGER NOT NULL DEFAULT 0,
     current_level INTEGER NOT NULL DEFAULT 1,
-    max_experience INTEGER NOT NULL DEFAULT 100
+    max_experience INTEGER NOT NULL DEFAULT 100,
+    guild_id BIGINT NOT NULL DEFAULT 0,
+  );
 
-);
+CREATE TABLE
+  IF NOT EXISTS guild(guild_id BIGSERIAL PRIMARY KEY);
 
-CREATE TABLE IF NOT EXISTS guild(
-    guild_id BIGSERIAL PRIMARY KEY,
-    starboard_channel_id INTEGER DEFAULT 0
-);
-
-CREATE TABLE IF NOT EXISTS roles_level(
+CREATE TABLE
+  IF NOT EXISTS roles_level(
     guild_id BIGSERIAL PRIMARY KEY,
     role_id INTEGER NOT NULL DEFAULT 0,
     level_ INTEGER NOT NULL DEFAULT 0
-);
+  );
 
-CREATE TABLE IF NOT EXISTS levels_background(
+CREATE TABLE
+  IF NOT EXISTS levels_background(
     guild_id BIGSERIAL PRIMARY KEY,
     background TEXT DEFAULT NULL
-);
+  );
 
-CREATE TABLE font_colors(
+CREATE TABLE
+  IF NOT EXISTS font_colors(
     guild_id BIGSERIAL PRIMARY KEY,
     color TEXT DEFAULT '255,255,255'
-)
+  );

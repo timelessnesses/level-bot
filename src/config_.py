@@ -73,7 +73,7 @@ class Configure(commands.Cog):
         Add a role to the list of roles that can be assigned to a user based on their level.
         """
         await sqls.execute(
-            "UPDATE INTO roles_levels (guild_id, level, role_id) VALUES ($1, $2, $3)",
+            "INSERT INTO roles_levels (guild_id, level, role_id) VALUES ($1, $2, $3)",
             ctx.guild.id,
             level,
             role.id,

@@ -1,0 +1,17 @@
+{
+    "recommendations": [
+        "gruntfuggly.bettercomment",
+        "aaron-bond.better-comments",
+        "coenraads.bracket-pair-colorizer",
+        "philhindle.errorlens",
+        "pkief.material-icon-theme",
+        "christian-kohler.path-intellisense",
+        "bradymholt.pgformatter",
+        "ms-ossdata.vscode-postgresql",
+        "inferrinizzard.prettier-sql-vscode",
+        "ms-python.python",
+        "mtxr.sqltools",
+        "vscode-icons-team.vscode-icons",
+        "jtr.vscode-position"
+    ]
+}

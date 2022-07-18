@@ -19,7 +19,6 @@ class Generator:
             os.path.dirname(__file__), "assets", "streaming.png"
         )
         self.font1 = os.path.join(os.path.dirname(__file__), "assets", "font.ttf")
-        self.font2 = os.path.join(os.path.dirname(__file__), "assets", "font2.ttf")
 
     async def generate_profile(
         self,
@@ -28,7 +27,6 @@ class Generator:
         level: int = 1,
         user_xp: int = 20,
         next_xp: int = 100,
-        global_position: int = 1,
         server_position: int = 1,
         user_name: str = "Dummy#0000",
         user_status: str = "online",
@@ -95,7 +93,6 @@ class Generator:
         # ======== Fonts to use =============
         font_normal = ImageFont.truetype(self.font1, 36)
         font_small = ImageFont.truetype(self.font1, 20)
-        ImageFont.truetype(self.font2, 25)
 
         # ======== Colors ========================
 
@@ -111,7 +108,7 @@ class Generator:
         draw.text((245, 22), user_name, font_color, font=font_normal)
         draw.text(
             (245, 98),
-            f"Global/Server Rank #{global_position}/#{server_position}",
+            f"Server Rank #{server_position}",
             font_color,
             font=font_small,
         )
@@ -159,3 +156,6 @@ class Generator:
         final.save(final_bytes, "png")
         final_bytes.seek(0)
         return discord.File(final_bytes, filename="profile.png")
+
+
+generate_profile = Generator().generate_profile

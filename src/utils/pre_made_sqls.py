@@ -1,5 +1,6 @@
-import asyncpg
 from datetime import datetime
+
+import asyncpg
 
 db: asyncpg.Pool = None
 
@@ -30,6 +31,6 @@ async def update_user_voicechat(user_id: int, when: datetime):
         )
 
 
-async def execute(schema: str):
+async def execute(schema: str, *args):
     async with db.acquire() as conn:
-        return await conn.execute(schema)
+        return await conn.execute(schema, *args)

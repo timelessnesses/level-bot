@@ -6,11 +6,13 @@ import traceback
 import discord
 from discord.ext import commands
 from discord.utils import MISSING
+import logging
 
 
 class Events(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.log = logging.getLogger("root.Events")
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: Exception):
@@ -102,6 +104,7 @@ class Events(commands.Cog):
                 ),
                 file=file,
             )
+            traceback.print_exc()
 
 
 async def setup(bot: commands.Bot):

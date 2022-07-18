@@ -1,6 +1,6 @@
 import platform
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import discord
 import psutil
@@ -10,7 +10,6 @@ from . import utils
 
 sys.path.append("..")
 
-from config import config
 
 
 class Stuff(

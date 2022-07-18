@@ -46,26 +46,6 @@ class Configure(commands.Cog):
             await ctx.send_help()
 
     @config.command()
-    async def starboard_channel(
-        self, ctx: commands.Context, channel: discord.TextChannel
-    ):
-        """
-        Set the channel for the starboard.
-        """
-        await sqls.execute(
-            "UPDATE guild SET starboard_channel_id = $1 WHERE guild_id = $2",
-            channel.id,
-            ctx.guild.id,
-        )
-        await ctx.send(
-            embed=discord.Embed(
-                title="Success!",
-                description="Starboard channel set to {}".format(channel.mention),
-                color=discord.Color.green(),
-            )
-        )
-
-    @config.command()
     async def add_roles_level(
         self, ctx: commands.Context, level: int, role: discord.Role
     ):
@@ -73,7 +53,7 @@ class Configure(commands.Cog):
         Add a role to the list of roles that can be assigned to a user based on their level.
         """
         await sqls.execute(
-            "INSERT INTO roles_levels (guild_id, level, role_id) VALUES ($1, $2, $3)",
+            "INSERT INTO roles_level (guild_id, level, role_id) VALUES ($1, $2, $3)",
             ctx.guild.id,
             level,
             role.id,

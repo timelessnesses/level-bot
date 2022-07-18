@@ -93,7 +93,7 @@ class Generator:
         # ======== Fonts to use =============
         font_normal = ImageFont.truetype(self.font1, 36)
         font_small = ImageFont.truetype(self.font1, 20)
-
+        level_font = ImageFont.truetype(self.font1, 30)
         # ======== Colors ========================
 
         def get_str(xp):
@@ -107,12 +107,12 @@ class Generator:
         draw = ImageDraw.Draw(card)
         draw.text((245, 22), user_name, font_color, font=font_normal)
         draw.text(
-            (245, 98),
+            (245, 123),
             f"Server Rank #{server_position}",
             font_color,
             font=font_small,
         )
-        draw.text((245, 123), f"Level {level}", font_color, font=font_small)
+        draw.text((245, 74), f"Level {level}", font_color, font=level_font)
         draw.text(
             (245, 150),
             f"Exp {get_str(user_xp)}/{get_str(next_xp)}",

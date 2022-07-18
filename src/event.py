@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 from discord.utils import MISSING
 import logging
+import copy
 
 
 class Events(commands.Cog):
@@ -20,6 +21,7 @@ class Events(commands.Cog):
         error_message = "".join(
             traceback.format_exception(type(error), error, error.__traceback__)
         )
+        j = copy.copy(error_message)
         discord_version = discord.__version__
         file = MISSING
         if len(error_message) <= 4096:
@@ -104,7 +106,7 @@ class Events(commands.Cog):
                 ),
                 file=file,
             )
-            traceback.print_exc()
+            self.bot.log.error(j)
 
 
 async def setup(bot: commands.Bot):

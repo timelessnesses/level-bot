@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import asyncpg
-from .utils import pre_made_sqls as sqls
 import enum
 import yarl
 import io
@@ -38,12 +37,14 @@ class Configure(commands.Cog):
     def __init__(self, bot: commands.Cog):
         self.bot = bot
         self.db: asyncpg.pool.Pool = self.bot.db
-        self.bot.loop.create_task(sqls.set_database(self.db))
 
     @commands.hybrid_group()
     async def config(self, ctx: commands.Context):
         if ctx.invoked_with == "config":
             await ctx.send_help()
+
+    async def cog_before_invoke(self, ctx: commands.Context):
+        await ctx.defer()
 
     @config.command()
     async def add_roles_level(
@@ -52,8 +53,8 @@ class Configure(commands.Cog):
         """
         Add a role to the list of roles that can be assigned to a user based on their level.
         """
-        await sqls.execute(
-            "INSERT INTO roles_level (guild_id, level, role_id) VALUES ($1, $2, $3)",
+        await self.db.execute(
+            """INSERT INTO roles_level (guild_id, level, role_id) VALUES ($1, $2, $3) ON CONFLICT (guild_id, level) DO UPDATE SET role_id = $3 WHERE roles_level.guild_id = $1 AND roles_level.level = $2""",
             ctx.guild.id,
             level,
             role.id,
@@ -108,7 +109,7 @@ class Configure(commands.Cog):
                 file=discord.File(io.BytesIO(content), filename=f"stuff.{end}"),
             )
             return
-        await sqls.execute(
+        await self.db.execute(
             "UPDATE INTO levels_backgrounds (guild_id, background) VALUES ($1, $2, $3)",
             ctx.guild.id,
             path,
@@ -139,7 +140,7 @@ class Configure(commands.Cog):
                         description="Your RGB value is either wrong or left some of color value to none!",
                     )
                 )
-        await sqls.execute(
+        await self.db.execute(
             "UPDATE INTO font_colors(guild_id, color) VALUES ($1, $2)",
             ctx.guild.id,
             ",".join(rgb),

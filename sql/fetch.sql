@@ -1,4 +1,7 @@
-SELECT
-  *
-FROM
-  guild;
+UPDATE
+  user_
+SET
+  experience = 199
+WHERE
+  user_id = 890913140278181909
+  AND guild_id = 842827513830965378;

@@ -14,6 +14,9 @@ class Levelling(commands.Cog):
         self.bot = bot
         self.db: bot_.EasySQL = self.bot.db
 
+    async def cog_before_invoke(self, ctx: commands.Context):
+        await ctx.defer()
+
     @commands.hybrid_group()
     async def level(self, ctx: commands.Context, member: discord.Member = None):
         """
@@ -62,7 +65,11 @@ class Levelling(commands.Cog):
             "SELECT * FROM user_ WHERE guild_id = $1", member.guild.id
         )
         users = sorted(users, key=lambda x: x["experience"], reverse=True)
-        position = users.index(level) + 1
+        position = 1
+        for user in users:
+            if user["user_id"] == member.id:
+                break
+            position += 1
         xp = level["experience"]
         max_xp = 100
         color = tuple(
@@ -77,23 +84,26 @@ class Levelling(commands.Cog):
         return await ctx.send(
             file=await imagegen.generate_profile(
                 bg_path,
-                avatar,
-                level["current_level"],
-                xp,
-                max_xp,
+                str(ctx.author.avatar.url),
+                level["experience"] // 100,
+                level["experience"] % 100,
+                100,
                 position,
-                str(member),
-                str(member.status),
-                color,
-            )
+                str(ctx.author),
+                str(ctx.author.status),
+            ),
         )
 
     # TODO: make a on_message event that listen and keep track of the member's message then increase the exp
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        if message.author.bot:
+            return
         exp = (
             await self.db.fetch(
-                "SELECT experience FROM user_ WHERE user_id = $1", message.author.id
+                "SELECT experience FROM user_ WHERE user_id = $1 AND guild_id = $2",
+                message.author.id,
+                message.guild.id,
             )
         )[0]["experience"]
         level = exp // 100
@@ -120,21 +130,19 @@ class Levelling(commands.Cog):
                 "SELECT * FROM user_ WHERE guild_id = $1", message.guild.id
             )
             users = sorted(users, key=lambda x: x["experience"], reverse=True)
-            position = (
-                users.index(
-                    await self.db.fetch(
-                        "SELECT * FROM user_ WHERE user_id = $1", message.author.id
-                    )
-                )
-                + 1
-            )
+            position = 1
+            for user in users:
+                if user["user_id"] == message.author.id:
+                    break
+                position += 1
+            left_over = exp % 100
             await message.channel.send(
                 f"Congratulations {message.author.mention}! You have leveled up to level {exp // 100}!",
                 file=await imagegen.generate_profile(
                     bg_path,
                     str(message.author.avatar.url),
                     exp // 100,
-                    exp,
+                    left_over,
                     100,
                     position,
                     str(message.author),
@@ -142,9 +150,10 @@ class Levelling(commands.Cog):
                 ),
             )
         await self.db.execute(
-            "UPDATE user_ SET experience = $1 WHERE user_id = $2",
+            "UPDATE user_ SET experience = $1 WHERE user_id = $2 AND guild_id = $3",
             exp,
             message.author.id,
+            message.guild.id,
         )
 
 

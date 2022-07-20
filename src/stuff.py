@@ -6,7 +6,7 @@ import discord
 import psutil
 from discord.ext import commands
 
-from . import utils
+from .utils import time
 
 sys.path.append("..")
 
@@ -25,8 +25,11 @@ class Stuff(
     def display_emoji(self):
         return "💭"
 
+    async def cog_before_invoke(self, ctx: commands.Context):
+        await ctx.defer()
+
     @commands.hybrid_command(name="credits", aliases=["c"])
-    async def credits(self, ctx):
+    async def credits(self, ctx: commands.Context):
         """
         Shows the credits.
         """
@@ -43,7 +46,7 @@ class Stuff(
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="ping", aliases=["p"])
-    async def ping(self, ctx):
+    async def ping(self, ctx: commands.Context):
         """
         Pong!
         """
@@ -55,7 +58,7 @@ class Stuff(
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="status")
-    async def status(self, ctx):
+    async def status(self, ctx: commands.Context):
         """
         Status of bot like uptime, memory usage, etc.
         """
@@ -67,7 +70,7 @@ class Stuff(
         embed.add_field(name="Disk", value=f"{psutil.disk_usage('/').percent}%")
         embed.add_field(
             name="Uptime",
-            value=f"{utils.time.human_timedelta(datetime.utcnow(), source=self.bot.start_time)}",
+            value=f"{time.human_timedelta(datetime.utcnow(), source=self.bot.start_time)}",
         )
         embed.add_field(name="Python", value=f"{platform.python_version()}")
         embed.add_field(name="Discord.py", value=f"{discord.__version__}")

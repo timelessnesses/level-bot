@@ -63,7 +63,5 @@ database_url = "paste your entire postgresql connection string here if you don't
 ## Features
 
 - [x] Level system
-- [x] Be able to track user's message or voice chat activity
 - [x] Boost up your level by doing activities
-- [x] Star board for mark your message by using your experience
-- [x] Be able to set your own level requirement for something important like limiting new members to posting files or joining voice chat
+- [x] Be able to set your own level requirement for something important like limiting new members to posting files or joining voice chat (by manage your own role)

@@ -110,13 +110,15 @@ async def main():
         while not started:
             async with bot:
                 try:
-                    bot.db = await EasySQL().connect(**args)
+                    bot.db = EasySQL()
+                    await bot.db.connect(**args)
                 except ConnectionError:
                     log.fatal("Failed to connect to database")
                     log.info("Trying to remove SSL context")
                     args["ssl"] = None
                     try:
-                        bot.db = await EasySQL().connect(**args)
+                        bot.db = EasySQL()
+                        await bot.db.connect(**args)
                     except ConnectionError:
                         log.exception("Failed to connect to database")
                         log.fatal("Exiting...")

@@ -6,7 +6,7 @@ from .utils import pre_made_sqls as sqls
 from .utils import imagegen
 import bot as bot_
 import random
-import yarl
+import random
 
 
 class Levelling(commands.Cog):
@@ -61,11 +61,10 @@ class Levelling(commands.Cog):
         users = await self.db.fetch(
             "SELECT * FROM user_ WHERE guild_id = $1", member.guild.id
         )
-        print(type(users))
         users = sorted(users, key=lambda x: x["experience"], reverse=True)
         position = users.index(level) + 1
         xp = level["experience"]
-        max_xp = level["max_experience"]
+        max_xp = 100
         color = tuple(
             int(x)
             for x in (
@@ -75,7 +74,6 @@ class Levelling(commands.Cog):
                 )
             )[0]["color"].split(",")
         )
-        await ctx.send(color)
         return await ctx.send(
             file=await imagegen.generate_profile(
                 bg_path,
@@ -93,8 +91,61 @@ class Levelling(commands.Cog):
     # TODO: make a on_message event that listen and keep track of the member's message then increase the exp
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        # await self.db.execute("UPDATE user_")
-        pass
+        exp = (
+            await self.db.fetch(
+                "SELECT experience FROM user_ WHERE user_id = $1", message.author.id
+            )
+        )[0]["experience"]
+        level = exp // 100
+        if level <= 50:
+            exp += random.randint(1, 10)
+        elif level <= 100:
+            exp += random.randint(1, 8)
+        elif level <= 150:
+            exp += random.randint(1, 6)
+        elif level <= 200:
+            exp += random.randint(1, 4)
+        elif level <= 400:
+            exp += random.randint(1, 3)
+        else:
+            exp += random.randint(1, 2)
+        if (exp // 100) > (level):
+            bg_path = (
+                await self.db.fetch(
+                    "SELECT background FROM levels_background WHERE guild_id = $1",
+                    message.guild.id,
+                )
+            )[0]["background"]
+            users = await self.db.fetch(
+                "SELECT * FROM user_ WHERE guild_id = $1", message.guild.id
+            )
+            users = sorted(users, key=lambda x: x["experience"], reverse=True)
+            position = (
+                users.index(
+                    await self.db.fetch(
+                        "SELECT * FROM user_ WHERE user_id = $1", message.author.id
+                    )
+                )
+                + 1
+            )
+            await message.channel.send(
+                f"Congratulations {message.author.mention}! You have leveled up to level {exp // 100}!",
+                file=await imagegen.generate_profile(
+                    bg_path,
+                    str(message.author.avatar.url),
+                    exp // 100,
+                    exp,
+                    100,
+                    position,
+                    str(message.author),
+                    str(message.author.status),
+                ),
+            )
+        await self.db.execute(
+            "UPDATE user_ SET experience = $1 WHERE user_id = $2",
+            exp,
+            message.author.id,
+        )
 
 
 async def setup(bot: commands.Bot):

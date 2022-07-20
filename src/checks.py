@@ -10,7 +10,6 @@ class Checks(commands.Cog):
         self.bot.loop.create_task(self.check_guilds())
         self.bot.loop.create_task(self.check_users())
         self.db: bot_.EasySQL = self.bot.db
-        self.bot.loop.create_task(sqls.set_database(self.db))
 
     async def check_guilds(self):
         await self.bot.wait_until_ready()
@@ -70,11 +69,9 @@ class Checks(commands.Cog):
             if not user_sql:
                 await self.db.execute(
                     """
-                    INSERT INTO user_(user_id, experience, max_experience, current_level, guild_id) VALUES ($1, $2, $3, $4, $5);
+                    INSERT INTO user_(user_id, experience, guild_id) VALUES ($1, $2, $3);
                     """,
                     member.id,
-                    1,
-                    100,
                     1,
                     member.guild.id,
                 )
@@ -85,11 +82,9 @@ class Checks(commands.Cog):
             return
         await self.db.execute(
             """
-            INSERT INTO user_(user_id, experience, max_experience, level_, guild_id) VALUES ($1, $2, $3, $4);
-            """,
+                    INSERT INTO user_(user_id, experience, guild_id) VALUES ($1, $2, $3);
+                    """,
             member.id,
-            0,
-            0,
             1,
             member.guild.id,
         )

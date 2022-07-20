@@ -2,8 +2,6 @@ CREATE TABLE
   IF NOT EXISTS user_(
     user_id BIGINT NOT NULL,
     experience INTEGER NOT NULL DEFAULT 0,
-    current_level INTEGER NOT NULL DEFAULT 1,
-    max_experience INTEGER NOT NULL DEFAULT 100,
     guild_id BIGINT NOT NULL DEFAULT 0
   );
 

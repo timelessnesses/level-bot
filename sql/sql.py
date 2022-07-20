@@ -7,19 +7,16 @@ class EasySQL:
     def __init__(self) -> None:
         self.db: asyncpg.Pool = None
 
-    async def connect(self, **kwargs) -> typing.Optional[asyncpg.connection.Connection]:
+    async def connect(self, **kwargs) -> typing.NoReturn:
         self.db = await asyncpg.create_pool(**kwargs)
-        return self.db
 
-    async def execute(self, query, *args) -> typing.Optional[dict]:
+    async def execute(self, query, *args) -> typing.NoReturn:
         async with self.db.acquire() as conn:
             await conn.execute(query, *args)
-            return dict(conn)
 
     async def fetch(self, query, *args) -> typing.Optional[dict]:
         async with self.db.acquire() as conn:
-            await conn.execute(query, *args)
-            return dict(conn)
+            return await conn.fetch(query, *args)
 
     async def close(self) -> None:
         await self.db.close()

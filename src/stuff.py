@@ -11,7 +11,6 @@ from . import utils
 sys.path.append("..")
 
 
-
 class Stuff(
     commands.Cog,
 ):

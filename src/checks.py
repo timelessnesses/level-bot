@@ -136,26 +136,38 @@ class Checks(commands.Cog):
             for member in guild.members:
                 if member.bot:
                     continue
+                print(member)
                 user = await self.db.fetch(
                     "SELECT * FROM user_ WHERE user_id = $1 AND guild_id = $2",
                     member.id,
                     guild.id,
                 )
                 if not user:
+                    print("isn't exists")
                     continue
                 level = user[0]["experience"] // 100
                 level_role = await self.db.fetch(
-                    "SELECT * FROM level_roles WHERE guild_id = $1 AND level = $2",
+                    "SELECT * FROM roles_level WHERE guild_id = $1 AND level_ = $2",
                     guild.id,
                     level,
                 )
                 if not level_role:
+                    print("no level role")
                     continue
-                if not member.guild.get_role(level_role[0]["role_id"]):
-                    await member.add_roles(
-                        member.guild.get_role(level_role[0]["role_id"])
+                if (
+                    not discord.utils.get(
+                        await guild.fetch_roles(), id=level_role[0]["role_id"]
                     )
+                    in member.roles
+                ):
+                    await member.add_roles(
+                        discord.utils.get(
+                            await guild.fetch_roles(), id=level_role[0]["role_id"]
+                        )
+                    )
+                    print("add role")
                 else:
+                    print("already has")
                     continue
 
 

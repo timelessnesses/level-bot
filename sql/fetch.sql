@@ -1,7 +1,7 @@
 UPDATE
   user_
 SET
-  experience = 199
+  experience = 499
 WHERE
   user_id = 890913140278181909
-  AND guild_id = 842827513830965378;
+  AND guild_id = 953290841731006504;

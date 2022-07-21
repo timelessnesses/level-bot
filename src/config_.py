@@ -182,14 +182,14 @@ class Configure(commands.Cog):
         if thing == Things.background:
             await self.db.execute(
                 "UPDATE levels_background SET background = $1 WHERE guild_id = $2",
-                ctx.guild.id,
                 None,
+                ctx.guild.id,
             )
         elif thing == Things.rgb:
             await self.db.execute(
                 "UPDATE font_colors SET color = $1 WHERE guild_id = $2",
-                ctx.guild.id,
                 None,
+                ctx.guild.id,
             )
         elif thing == Things.roles_level:
             await self.db.execute(

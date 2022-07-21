@@ -1,12 +1,18 @@
-import discord
-from discord.ext import commands
-import asyncpg
 import enum
-import yarl
 import io
+
 import aiohttp
+import asyncpg
+import discord
+import yarl
+from discord.ext import commands
 from PIL import Image, ImageDraw
-import io
+
+
+class Things(enum.Enum):
+    background = "background"
+    rgb = "rgb"
+    roles_level = "roles_level"
 
 
 class Permissions(enum.Enum):
@@ -38,6 +44,10 @@ class Configure(commands.Cog):
         self.bot = bot
         self.db: asyncpg.pool.Pool = self.bot.db
 
+    @property
+    def display_emoji(self):
+        return "🔨"
+
     @commands.hybrid_group()
     async def config(self, ctx: commands.Context):
         if ctx.invoked_with == "config":
@@ -53,12 +63,20 @@ class Configure(commands.Cog):
         """
         Add a role to the list of roles that can be assigned to a user based on their level.
         """
-        await self.db.execute(
-            """INSERT INTO roles_level (guild_id, level, role_id) VALUES ($1, $2, $3) ON CONFLICT (guild_id, level) DO UPDATE SET role_id = $3 WHERE roles_level.guild_id = $1 AND roles_level.level = $2""",
-            ctx.guild.id,
-            level,
-            role.id,
-        )
+        try:
+            await self.db.execute(
+                """INSERT INTO roles_level (guild_id, level_, role_id) VALUES ($1, $2, $3)""",
+                ctx.guild.id,
+                level,
+                role.id,
+            )
+        except asyncpg.UniqueViolationError:
+            await self.db.execute(
+                """UPDATE  roles_level SET role_id = $3 WHERE guild_id = $1 AND level_ = $2""",
+                ctx.guild.id,
+                level,
+                role.id,
+            )
         await ctx.send(
             embed=discord.Embed(
                 title="Success!",
@@ -110,7 +128,7 @@ class Configure(commands.Cog):
             )
             return
         await self.db.execute(
-            "UPDATE INTO levels_backgrounds (guild_id, background) VALUES ($1, $2, $3)",
+            "UPDATE levels_background SET background = $2 WHERE guild_id = $1",
             ctx.guild.id,
             path,
         )
@@ -121,7 +139,7 @@ class Configure(commands.Cog):
                 description="Changed background to",
                 color=discord.Color.green(),
             ),
-            file=discord.File(io.BytesIO(content)),
+            file=discord.File(io.BytesIO(content), filename=f"stuff.{end}"),
         )
 
     @config.command()
@@ -141,7 +159,7 @@ class Configure(commands.Cog):
                     )
                 )
         await self.db.execute(
-            "UPDATE INTO font_colors(guild_id, color) VALUES ($1, $2)",
+            "UPDATE  font_colors SET color = $1 WHERE guild_id = $2",
             ctx.guild.id,
             ",".join(rgb),
         )
@@ -154,6 +172,37 @@ class Configure(commands.Cog):
         await ctx.send(
             embed=discord.Embed(title="Here's your color result!"),
             file=discord.File(file),
+        )
+
+    @config.command()
+    async def reset(self, ctx: commands.Context, thing: Things, level: int = None):
+        """
+        Reset the configuration of the bot.
+        """
+        if thing == Things.background:
+            await self.db.execute(
+                "UPDATE levels_background SET background = $1 WHERE guild_id = $2",
+                ctx.guild.id,
+                None,
+            )
+        elif thing == Things.rgb:
+            await self.db.execute(
+                "UPDATE font_colors SET color = $1 WHERE guild_id = $2",
+                ctx.guild.id,
+                None,
+            )
+        elif thing == Things.roles_level:
+            await self.db.execute(
+                "DELETE FROM roles_level WHERE level_ = $1 AND guild_id = $2",
+                level,
+                ctx.guild.id,
+            )
+        await ctx.send(
+            embed=discord.Embed(
+                title="Success!",
+                description="Reseted {}".format(thing.value),
+                color=discord.Color.green(),
+            )
         )
 
 

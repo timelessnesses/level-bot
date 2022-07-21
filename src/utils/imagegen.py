@@ -1,11 +1,11 @@
 import math
 import os
+import typing
 from io import BytesIO
 
-from PIL import Image, ImageDraw, ImageFont
-import discord
 import aiohttp
-import typing
+import discord
+from PIL import Image, ImageDraw, ImageFont
 
 
 class Generator:

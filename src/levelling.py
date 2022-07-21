@@ -1,21 +1,30 @@
-from .utils import imagegen
-from discord.ext import commands
+import random
+import time
+
 import discord
-import asyncpg
-from .utils import pre_made_sqls as sqls
-from .utils import imagegen
+from discord.ext import commands
+
 import bot as bot_
-import random
-import random
+
+from .utils import imagegen
 
 
 class Levelling(commands.Cog):
+    """
+    Levelling group command
+    """
+
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.db: bot_.EasySQL = self.bot.db
+        self.ratelimit = {}
 
     async def cog_before_invoke(self, ctx: commands.Context):
         await ctx.defer()
+
+    @property
+    def display_emoji(self):
+        return "📈"
 
     @commands.hybrid_group()
     async def level(self, ctx: commands.Context, member: discord.Member = None):
@@ -29,6 +38,9 @@ class Levelling(commands.Cog):
 
     @level.command(name="info", aliases=["lvl"])
     async def info(self, ctx: commands.Context, member: discord.Member = None):
+        """
+        Show your information inside this guild!
+        """
         # TODO: sort members in guild :pog:
         if member is None:
             member = ctx.author
@@ -41,9 +53,9 @@ class Levelling(commands.Cog):
                 )
             )
         try:
-            avatar = str(member.guild_avatar.url)
+            str(member.guild_avatar.url)
         except AttributeError:
-            avatar = str(member.avatar.url)
+            str(member.avatar.url)
 
         level = (
             await self.db.fetch(
@@ -70,8 +82,7 @@ class Levelling(commands.Cog):
             if user["user_id"] == member.id:
                 break
             position += 1
-        xp = level["experience"]
-        max_xp = 100
+        level["experience"]
         color = tuple(
             int(x)
             for x in (
@@ -99,6 +110,13 @@ class Levelling(commands.Cog):
     async def on_message(self, message: discord.Message):
         if message.author.bot:
             return
+        try:
+            assert time.time() - self.ratelimit[message.author.id]["time"] >= 2
+        except KeyError:
+            self.ratelimit[message.author.id] = {"time": time.time()}
+        except AssertionError:
+            return
+        self.ratelimit[message.author.id]["time"] = time.time()
         exp = (
             await self.db.fetch(
                 "SELECT experience FROM user_ WHERE user_id = $1 AND guild_id = $2",

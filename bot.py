@@ -123,6 +123,10 @@ async def main():
                         log.exception("Failed to connect to database")
                         log.fatal("Exiting...")
                         return
+                await bot.db.execute(
+                    open("sql/schema.sql", "r").read(),
+                )
+                log.info("Executed start up SQL command!")
                 for extension in os.listdir("src"):
                     if extension.endswith(".py") and not extension.startswith("_"):
                         await bot.load_extension(f"src.{extension[:-3]}")

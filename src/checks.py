@@ -1,7 +1,7 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
+
 import bot as bot_
-from .utils import pre_made_sqls as sqls
 
 
 class Checks(commands.Cog):
@@ -10,6 +10,7 @@ class Checks(commands.Cog):
         self.bot.loop.create_task(self.check_guilds())
         self.bot.loop.create_task(self.check_users())
         self.db: bot_.EasySQL = self.bot.db
+        self.check_levels.start()
 
     async def check_guilds(self):
         await self.bot.wait_until_ready()
@@ -127,6 +128,35 @@ class Checks(commands.Cog):
             "DELETE FROM levels_background WHERE guild_id = $1", guild.id
         )
         await self.db.execute("DELETE FROM font_colors WHERE guild_id = $1", guild.id)
+
+    @tasks.loop(seconds=5)
+    async def check_levels(self):
+        await self.bot.wait_until_ready()
+        for guild in self.bot.guilds:
+            for member in guild.members:
+                if member.bot:
+                    continue
+                user = await self.db.fetch(
+                    "SELECT * FROM user_ WHERE user_id = $1 AND guild_id = $2",
+                    member.id,
+                    guild.id,
+                )
+                if not user:
+                    continue
+                level = user[0]["experience"] // 100
+                level_role = await self.db.fetch(
+                    "SELECT * FROM level_roles WHERE guild_id = $1 AND level = $2",
+                    guild.id,
+                    level,
+                )
+                if not level_role:
+                    continue
+                if not member.guild.get_role(level_role[0]["role_id"]):
+                    await member.add_roles(
+                        member.guild.get_role(level_role[0]["role_id"])
+                    )
+                else:
+                    continue
 
 
 async def setup(bot: commands.Bot):

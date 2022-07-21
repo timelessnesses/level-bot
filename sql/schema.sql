@@ -11,7 +11,7 @@ CREATE TABLE
 CREATE TABLE
   IF NOT EXISTS roles_level(
     guild_id BIGINT,
-    role_id INTEGER NOT NULL DEFAULT 0,
+    role_id BIGINT NOT NULL DEFAULT 0,
     level_ INTEGER NOT NULL DEFAULT 0
   );
 

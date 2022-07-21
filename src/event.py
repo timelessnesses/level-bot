@@ -1,13 +1,13 @@
+import copy
 import difflib
 import io
+import logging
 import sys
 import traceback
 
 import discord
 from discord.ext import commands
 from discord.utils import MISSING
-import logging
-import copy
 
 
 class Events(commands.Cog):

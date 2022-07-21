@@ -1,5 +1,6 @@
-from src.utils.imagegen import Generator
 import asyncio
+
+from src.utils.imagegen import Generator
 
 open("g.png", "wb").write(
     asyncio.run(

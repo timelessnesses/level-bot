@@ -155,7 +155,7 @@ class Levelling(commands.Cog):
                 position += 1
             left_over = exp % 100
             await message.channel.send(
-                f"Congratulations {message.author.mention}! You have leveled up to level {exp // 100}!",
+                f"Congratulations {message.author.mention}! You have leveled up to level {exp // 100 + 1}!",
                 file=await imagegen.generate_profile(
                     bg_path,
                     str(message.author.avatar.url),

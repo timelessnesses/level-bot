@@ -54,6 +54,7 @@ class Activity(commands.Cog):
                 color=discord.Color.yellow(),
             ),
             view=ui,
+            delete_after=10,
         )
         finished = await ui.wait()
         if finished == False:
@@ -71,7 +72,12 @@ class Activity(commands.Cog):
                     color=discord.Color.red(),
                 )
             )
-        exp = random.randint(20, 70)
+        exp = await self.db.fetch(
+            "SELECT experience FROM user_ WHERE guild_id = ? AND user_id = ?",
+            ctx.guild.id,
+            ctx.author.id,
+        )
+        exp += random.randint(20, 70)
         bg_path = (
             await self.db.fetch(
                 "SELECT background FROM levels_background WHERE guild_id = $1",
@@ -103,6 +109,12 @@ class Activity(commands.Cog):
                 str(ctx.author),
                 str(ctx.author.status),
             ),
+        )
+        await self.db.execute(
+            "UPDATE user_ SET experience = $1 WHERE guild_id = $2 AND user_id = $3",
+            exp,
+            ctx.guild.id,
+            ctx.author.id,
         )
 
 

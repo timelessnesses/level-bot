@@ -1,8 +1,10 @@
 import asyncio
-
+import time
 from src.utils.imagegen import Generator
+from datetime import timedelta
 
-open("g.png", "wb").write(
+for x in range(10):
+    start = time.perf_counter()
     asyncio.run(
         Generator().generate_profile(
             None,
@@ -14,5 +16,5 @@ open("g.png", "wb").write(
             "deez nut#0000",
             "online",
         )
-    ).fp.read()
-)
+    )
+    print(timedelta(seconds=time.time() - start))

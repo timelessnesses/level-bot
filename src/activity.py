@@ -35,6 +35,9 @@ class Activity(commands.Cog):
 
     @activity.command()
     async def repeat_after_me(self, ctx: commands.Context):
+        """
+        A game where you think which word the bot said before!
+        """
         choosen = await wordnik_wrapper.get_random_word()
         words = [await wordnik_wrapper.get_random_word() for _ in range(3)]
         words.append(choosen)

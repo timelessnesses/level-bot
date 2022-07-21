@@ -157,11 +157,19 @@ class Checks(commands.Cog):
                     )
                     in member.roles
                 ):
-                    await member.add_roles(
-                        discord.utils.get(
-                            await guild.fetch_roles(), id=level_role[0]["role_id"]
+                    try:
+                        await member.add_roles(
+                            discord.utils.get(
+                                await guild.fetch_roles(), id=level_role[0]["role_id"]
+                            )
                         )
-                    )
+                    except discord.Forbidden:
+                        await guild.owner.send(
+                            embed=discord.Embed(
+                                title="You setup the bot wrong!",
+                                description="Please make sure I have the `Manage Roles` permission and stay in higher role than others.",
+                            )
+                        )
                 else:
                     continue
 

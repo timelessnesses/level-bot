@@ -4,16 +4,31 @@ import io
 import logging
 import sys
 import traceback
-
+import bot as bot_
 import discord
 from discord.ext import commands
 from discord.utils import MISSING
+import subprocess
 
 
 class Events(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.log = logging.getLogger("root.Events")
+
+    def revision_long_hash(self) -> str:
+        return (
+            subprocess.check_output(["git", "rev-parse", "HEAD"])
+            .decode("ascii")
+            .strip()
+        )
+
+    def revision_short_hash(self) -> str:
+        return (
+            subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+            .decode("ascii")
+            .strip()
+        )
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: Exception):
@@ -101,8 +116,14 @@ class Events(commands.Cog):
                         value=f"{python_version[0]}.{python_version[1]}.{python_version[2]}",
                         inline=True,
                     )
-                ).add_field(
+                )
+                .add_field(
                     name="Discord.py Version", value=discord_version, inline=True
+                )
+                .add_field(
+                    name="Github commit number",
+                    value=f"[{self.revision_short_hash()}](https://github.com/timelessnesses/level-bot/commit/{self.revision_long_hash()})",
+                    inline=True,
                 ),
                 file=file,
             )

@@ -55,6 +55,8 @@ class Configure(commands.Cog):
 
     async def cog_before_invoke(self, ctx: commands.Context):
         await ctx.defer()
+        if not ctx.author.guild_permissions.administrator or not ctx.author.guild_permissions.manage_guild:
+            raise commands.MissingPermissions(["administrator", "manage_guild"])
 
     @config.command()
     async def add_roles_level(

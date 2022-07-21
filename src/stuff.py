@@ -77,6 +77,30 @@ class Stuff(
         embed.add_field(name="Bot version", value=f"{self.bot.version_}")
         await ctx.send(embed=embed)
 
+    @commands.hybrid_command(name="invite", aliases=["i"])
+    async def invite(self, ctx: commands.Context):
+        """
+        Invite the bot to your server.
+        """
+        embed = discord.Embed(
+            title="Invite",
+            description="Invite the bot to your server!",
+            color=discord.Color.green(),
+        )
+        embed.add_field(
+            name="Invite link",
+            value="[Click here](https://discord.com/api/oauth2/authorize?client_id=997769719144788029&permissions=414733167712&scope=bot%20applications.commands)",
+        )
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name="raise")
+    @commands.is_owner()
+    async def raise_error(self, ctx: commands.Context):
+        """
+        Raise an error.
+        """
+        raise RuntimeError("This is a test error.")
+
 
 async def setup(bot):
     await bot.add_cog(Stuff(bot))

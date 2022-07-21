@@ -28,6 +28,9 @@ class Activity(commands.Cog):
     @commands.hybrid_group()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def activity(self, ctx: commands.Context):
+        """
+        Activity group command
+        """
         pass
 
     @activity.command()

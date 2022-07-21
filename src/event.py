@@ -2,13 +2,14 @@ import copy
 import difflib
 import io
 import logging
+import subprocess
 import sys
 import traceback
-import bot as bot_
+
 import discord
 from discord.ext import commands
 from discord.utils import MISSING
-import subprocess
+
 
 
 class Events(commands.Cog):

@@ -31,7 +31,6 @@ class Activity(commands.Cog):
         """
         Activity group command
         """
-        pass
 
     @activity.command()
     async def repeat_after_me(self, ctx: commands.Context):

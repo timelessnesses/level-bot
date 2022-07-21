@@ -1,7 +1,8 @@
 import asyncio
 import time
-from src.utils.imagegen import Generator
 from datetime import timedelta
+
+from src.utils.imagegen import Generator
 
 for x in range(10):
     start = time.perf_counter()

@@ -20,3 +20,12 @@ CREATE TABLE
 
 CREATE TABLE
   IF NOT EXISTS font_colors(guild_id BIGINT, color TEXT DEFAULT '255,255,255');
+
+CREATE TABLE
+  IF NOT EXISTS user_config(
+    user_id BIGINT NOT NULL,
+    send_level_up_message BOOLEAN NOT NULL DEFAULT TRUE
+  );
+
+CREATE TABLE
+  IF NOT EXISTS prevent_channel_send(guild_id BIGINT NOT NULL, channel_id BIGINT NOT NULL);

@@ -38,6 +38,11 @@ class Checks(commands.Cog):
                     guild.id,
                     "255,255,255",
                 )
+                await self.db.execute(
+                    "INSERT INTO prevent_channel_send(guild_id, channel_id) VALUES ($1, $2);",
+                    guild.id,
+                    0,
+                )
 
             else:
                 if not await self.db.fetch(
@@ -77,6 +82,12 @@ class Checks(commands.Cog):
                     member.guild.id,
                 )
 
+                await self.db.execute(
+                    "INSERT INTO user_config(user_id, send_level_up_message) VALUES ($1, $2)",
+                    member.id,
+                    True,
+                )
+
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         if member.bot:
@@ -88,6 +99,12 @@ class Checks(commands.Cog):
             member.id,
             1,
             member.guild.id,
+        )
+
+        await self.db.execute(
+            "INSERT INTO user_config(user_id, send_level_up_message) VALUES ($1, $2)",
+            member.id,
+            True,
         )
 
     @commands.Cog.listener()
@@ -164,12 +181,7 @@ class Checks(commands.Cog):
                             )
                         )
                     except discord.Forbidden:
-                        await guild.owner.send(
-                            embed=discord.Embed(
-                                title="You setup the bot wrong!",
-                                description="Please make sure I have the `Manage Roles` permission and stay in higher role than others.",
-                            )
-                        )
+                        pass
                 else:
                     continue
 

@@ -70,16 +70,19 @@ class Activity(commands.Cog):
             return await ctx.send(
                 embed=discord.Embed(
                     title="Aw you answer it wrong!",
-                    description="The correct answer is: {}".format(choose),
+                    description="The correct answer is: {}".format(choosen),
                     color=discord.Color.red(),
                 )
             )
-        exp = await self.db.fetch(
-            "SELECT experience FROM user_ WHERE guild_id = ? AND user_id = ?",
-            ctx.guild.id,
-            ctx.author.id,
-        )
-        exp += random.randint(20, 70)
+        exp = (
+            await self.db.fetch(
+                "SELECT experience FROM user_ WHERE guild_id = $1 AND user_id = $2",
+                ctx.guild.id,
+                ctx.author.id,
+            )
+        )[0]["experience"]
+        m = random.randint(20, 70)
+        exp += m
         bg_path = (
             await self.db.fetch(
                 "SELECT background FROM levels_background WHERE guild_id = $1",
@@ -98,7 +101,7 @@ class Activity(commands.Cog):
             position += 1
         await ctx.send(
             embed=discord.Embed(
-                title="Congratulations! You earned yourself {} exp!".format(exp),
+                title="Congratulations! You earned yourself {} exp!".format(m),
                 color=discord.Color.green(),
             ),
             file=await imagegen.generate_profile(

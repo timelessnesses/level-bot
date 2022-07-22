@@ -137,7 +137,31 @@ class Levelling(commands.Cog):
             exp += random.randint(1, 3)
         else:
             exp += random.randint(1, 2)
-        if (exp // 100) > (level):
+        try:
+            disable_level_user = (
+                await self.db.fetch(
+                    "SELECT send_level_up_message FROM user_config WHERE user_id = $1",
+                    message.author.id,
+                )
+            )[0]["send_level_up_message"]
+        except (IndexError, KeyError) as e:
+            disable_level_user = False
+        try:
+            disable_level_guild_channel = await self.db.fetch(
+                "SELECT * FROM prevent_channel_send WHERE guild_id = $1 AND channel_id = $2",
+                message.guild.id,
+                message.channel.id,
+            )
+            assert disable_level_guild_channel is not None
+            disable_level_guild_channel[0]
+            disable_level_guild_channel[0]["channel_id"]
+        except (AssertionError, IndexError, KeyError) as e:
+            disable_level_guild_channel = False
+        if (
+            (exp // 100) > (level)
+            and (not disable_level_user)
+            and (not disable_level_guild_channel)
+        ):
             bg_path = (
                 await self.db.fetch(
                     "SELECT background FROM levels_background WHERE guild_id = $1",

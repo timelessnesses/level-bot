@@ -55,7 +55,9 @@ class Configure(commands.Cog):
 
     async def cog_before_invoke(self, ctx: commands.Context):
         await ctx.defer()
-        if (
+        if ctx.invoked_subcommand == "send_level_up":
+            pass
+        elif (
             not ctx.author.guild_permissions.administrator
             or not ctx.author.guild_permissions.manage_guild
         ):
@@ -206,6 +208,77 @@ class Configure(commands.Cog):
             embed=discord.Embed(
                 title="Success!",
                 description="Reseted {}".format(thing.value),
+                color=discord.Color.green(),
+            )
+        )
+
+    @config.command()
+    async def send_level_up(self, ctx: commands.Context, enable: bool = None):
+        """
+        Enable or disable the level up message.
+        """
+        if enable is None:
+            enable = not (
+                await self.db.fetch(
+                    "SELECT send_level_up_message FROM user_config WHERE user_id = $1",
+                    ctx.author.id,
+                )
+            )[0]["send_level_up_message"]
+        await self.db.execute(
+            "UPDATE user_config SET send_level_up_message = $1 WHERE user_id = $2",
+            enable,
+            ctx.author.id,
+        )
+        await ctx.send(
+            embed=discord.Embed(
+                title="Success!",
+                description="Changed level up message to {}".format(
+                    "enabled" if enable else "disabled"
+                ),
+                color=discord.Color.green(),
+            )
+        )
+
+    @config.command()
+    async def prevent_channel_send(
+        self, ctx: commands.Context, channel: discord.TextChannel, enable: bool
+    ):
+        """
+        Ban list that bot shouldn't send message to
+        """
+        if enable:
+            exists = await self.db.fetch(
+                "SELECT * FROM prevent_channel_send WHERE guild_id = $1 AND channel_id = $2",
+                ctx.guild.id,
+                channel.id,
+            )
+            if not exists:
+                await self.db.execute(
+                    "INSERT INTO prevent_channel_send VALUES ($1, $2)",
+                    ctx.guild.id,
+                    channel.id,
+                )
+            else:
+                await ctx.send(
+                    embed=discord.Embed(
+                        title="Error!",
+                        description="This channel is already in the ban list!",
+                        color=discord.Color.red(),
+                    )
+                )
+                return
+        else:
+            await self.db.execute(
+                "DELETE FROM prevent_channel_send WHERE guild_id = $1 AND channel_id = $2",
+                ctx.guild.id,
+                channel.id,
+            )
+        await ctx.send(
+            embed=discord.Embed(
+                title="Success!",
+                description="Changed prevent channel {} send to {}".format(
+                    channel.mention, "enabled" if enable else "disabled"
+                ),
                 color=discord.Color.green(),
             )
         )

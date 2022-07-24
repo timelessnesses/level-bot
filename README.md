@@ -35,11 +35,6 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 
-from dotenv import load_dotenv
-
-load_dotenv()
-import os
-
 token = "bot token"
 prefix = "prefix"
 database_host = "database's ip or domain"
